@@ -1,83 +1,102 @@
-﻿#include "stdio.h"
+﻿#include <stdio.h>
+#include "stdlib.h"
 #include "locale.h"
-#include "math.h"
-#include "assert.h"
+#include <math.h>
+#include <assert.h>
 
-bool check_number(int,int,int);
-void find_roots(double, double, double);
+#define ZERO 0.1e-8 //разрешаемая погреность 
 
-int main() 
+//--------------------------------------------------------------------------
+//Решает квадратное уравнение ax*x+bx+c=0
+//@param [in] a-coefficient
+//@param [in] b-coefficient
+//@param [in] c-coefficient
+//--------------------------------------------------------------------------
+void find_roots (double, double, double);
+
+//--------------------------------------------------------------------------
+//Функция для сравнения с нулем и проверки точности
+//@peram [in] Checked number
+//
+//return Yes(1) or Not(0)
+//--------------------------------------------------------------------------
+int eq_num_zero (double);
+
+int main () 
 {
-    setlocale(LC_ALL,"Russian");
+    setlocale (LC_ALL,"Russian");
 
-    double a, b, c;
-    int test_a, test_b, test_c;
+    double a = NAN, b = NAN, c = NAN;
 
-    printf("Введите коэффициенты квадратного уравнения:\n");
+    printf ("Введите коэффициенты квадратного уравнения:\n");
 
-    test_a = scanf_s ("%lg", &a);
+    scanf_s ("%lg", &a);
+    
+    scanf_s ("%lg", &b);
 
-    test_b = scanf_s ("%lg", &b);
-
-    test_c = scanf_s ("%lg", &c);
-
-    bool test = check_number(test_a, test_b, test_c);
-
-    if (test == false) 
-    {
-        printf("\nВведенные значения не являются корректными!\n");
-        return 1;
-    }
-
-    else
-    {
-        find_roots (a, b, c);
-        return 0;
-    }
+    scanf_s ("%lg", &c);
+    
+    find_roots (a, b, c);
+    
+    return 0;
+    
 }
+
 
 void find_roots (double a, double b, double c) 
 {
-    if (a != 0 && b == 0 && c == 0) 
+    assert (isfinite (a));
+    assert (isfinite (b));
+    assert (isfinite (c));
+
+    if (!eq_num_zero (a) && eq_num_zero (b) && eq_num_zero (c) )
     {
         printf("Корень равен 0");
     }
 
-    else if (a != 0)
+    else if (!eq_num_zero (a))
     {
         double D = b * b - 4 * a * c;
         if (D > 0) 
         {
             double x_1 = (-b + sqrt(D)) / (2 * a);
             double x_2 = (-b - sqrt(D)) / (2 * a);
-            printf("\nКорни квадратного уравнения равны:\nx_1=%lg\nx_2=%lg\n", x_1, x_2);
+            printf("\nКорни квадратного уравнения равны:\nx_1=%0.3lg\nx_2=%0.3lg\n", x_1, x_2);
         }
 
         else if (D == 0) 
         {
             double x = (-b) / (2 * a);
-            printf("\nКорень квадратного уравнения равен:\nx=%lg\n", x);
+            printf("\nКорень квадратного уравнения равен:\nx=%0.3lg\n", x);
         }
 
-        else 
+        else if (D < 0)
         {
             printf("\nДействительных корней данное уравнение не имеет!\n");
         }
 
     }
 
-    else 
+    else if (eq_num_zero (a) && eq_num_zero (b) && eq_num_zero (c))
     {
         printf("Корень- любое число\n");
     }
+    else if (eq_num_zero (a))
+    {
+        printf ("\nУравнение линейное\n");
+
+    }
 }
 
-bool check_number (int test_a, int test_b, int test_c) 
+int eq_num_zero (double num_test)
 {
-    if (test_a == 0 || test_b == 0 || test_c == 0)
+    if (num_test < ZERO)
     {
-        return false;
+         return 1;
     }
 
-    else return true;
+    else 
+    {
+        return 0;
+    }
 }
